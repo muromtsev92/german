@@ -16,6 +16,11 @@ public class WebConfig {
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://37.46.16.152")
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE");
+//            }
         };
     }
 }

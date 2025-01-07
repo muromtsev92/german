@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api/words';
+// const API_BASE_URL = 'http://37.46.16.152/api/words';
 
 export const getAllWords = async () => {
     const response = await axios.get(API_BASE_URL);
