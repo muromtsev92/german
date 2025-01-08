@@ -50,5 +50,10 @@ public class NounController {
                 .map(noun -> ResponseEntity.ok(noun.getTranslation().equalsIgnoreCase(translation)))
                 .orElse(ResponseEntity.badRequest().build());
     }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Noun>> bulk(@RequestBody List<Noun> nouns) {
+        return ResponseEntity.ok(nounService.addNounsBulk(nouns));
+    }
 }
 
