@@ -29,8 +29,8 @@ public class NounService {
 
     public Noun saveNoun(Noun noun) {
         nounRepository.findByWord(noun.getWord()).ifPresent(existing -> {
-            throw new IllegalArgumentException("Word already exists in the database: " + noun.getArticle()
-                    + " " + noun.getWord());
+            throw new IllegalArgumentException("Word already exists in the database: " + existing.getArticle()
+                    + " " + existing.getWord() + " - " + existing.getTranslation());
         });
         return nounRepository.save(noun);
     }
