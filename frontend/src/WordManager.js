@@ -1,56 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { getAllWords, addWord, deleteWord } from './api';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const WordManager = () => {
     const [words, setWords] = useState([]);
-    const [newWord, setNewWord] = useState('');
-    const [newTranslation, setNewTranslation] = useState('');
+    const [newWord, setNewWord] = useState("");
+    const [newTranslation, setNewTranslation] = useState("");
+    const [newArticle, setNewArticle] = useState("");
+
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
     useEffect(() => {
-        loadWords();
+        fetchWords();
     }, []);
 
-    const loadWords = async () => {
-        const data = await getAllWords();
-        setWords(data);
+    const fetchWords = async () => {
+        const response = await axios.get(`${API_BASE_URL}/api/nouns`);
+        setWords(response.data);
     };
 
-    const handleAddWord = async () => {
-        if (newWord && newTranslation) {
-            await addWord(newWord, newTranslation);
-            setNewWord('');
-            setNewTranslation('');
-            loadWords();
+    const addWord = async () => {
+        if (!newWord || !newTranslation || !newArticle) {
+            alert("Please fill in all fields");
+            return;
         }
+        await axios.post(`${API_BASE_URL}/api/nouns`, {
+            word: newWord,
+            translation: newTranslation,
+            article: newArticle,
+        });
+        fetchWords();
+        setNewWord("");
+        setNewTranslation("");
+        setNewArticle("");
     };
 
-    const handleDeleteWord = async (id) => {
-        await deleteWord(id);
-        loadWords();
+    const deleteWord = async (id) => {
+        await axios.delete(`${API_BASE_URL}/api/nouns/${id}`);
+        fetchWords();
     };
 
     return (
         <div>
-            <h1>Word Manager</h1>
+            <h2>Manage Words</h2>
             <div>
                 <input
                     type="text"
-                    placeholder="Word"
-                    value={newWord}
-                    onChange={(e) => setNewWord(e.target.value)}
+                    value={newArticle}
+                    onChange={(e) => setNewArticle(e.target.value)}
+                    placeholder="Article (der/die/das)"
                 />
                 <input
                     type="text"
-                    placeholder="Translation"
+                    value={newWord}
+                    onChange={(e) => setNewWord(e.target.value)}
+                    placeholder="Word"
+                />
+                <input
+                    type="text"
                     value={newTranslation}
                     onChange={(e) => setNewTranslation(e.target.value)}
+                    placeholder="Translation"
                 />
-                <button onClick={handleAddWord}>Add Word</button>
+                <button onClick={addWord}>Add Word</button>
             </div>
-            <table border="1">
+            <table>
                 <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Article</th>
                     <th>Word</th>
                     <th>Translation</th>
                     <th>Actions</th>
@@ -60,12 +77,11 @@ const WordManager = () => {
                 {words.map((word) => (
                     <tr key={word.id}>
                         <td>{word.id}</td>
+                        <td>{word.article}</td>
                         <td>{word.word}</td>
                         <td>{word.translation}</td>
                         <td>
-                            <button onClick={() => handleDeleteWord(word.id)}>
-                                Delete
-                            </button>
+                            <button onClick={() => deleteWord(word.id)}>Delete</button>
                         </td>
                     </tr>
                 ))}
