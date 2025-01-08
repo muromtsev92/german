@@ -7,9 +7,9 @@ function App() {
     return (
         <Router>
             <header>
-                <h1>German Learning App</h1>
+                <h1>DE-RU Dictionary</h1>
                 <nav>
-                    <Link to="/">Home</Link> | <Link to="/game">Game</Link>
+                    <Link to="/">Home</Link> | <Link to="/game">Spielen</Link>
                 </nav>
             </header>
             <main>

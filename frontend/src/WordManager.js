@@ -55,7 +55,7 @@ const WordManager = () => {
 
     return (
         <div>
-            <h2>Manage Words</h2>
+            <h2>Liste verwalten</h2>
             <div>
                 <input
                     type="text"
