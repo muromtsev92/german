@@ -6,6 +6,7 @@ const WordManager = () => {
     const [newWord, setNewWord] = useState("");
     const [newTranslation, setNewTranslation] = useState("");
     const [newArticle, setNewArticle] = useState("");
+    const [error, setError] = useState("");
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -20,19 +21,32 @@ const WordManager = () => {
 
     const addWord = async () => {
         if (!newWord || !newTranslation || !newArticle) {
-            alert("Please fill in all fields");
+            setError("Please fill in all fields");
             return;
         }
-        await axios.post(`${API_BASE_URL}/api/nouns`, {
-            word: newWord,
-            translation: newTranslation,
-            article: newArticle,
-        });
-        fetchWords();
-        setNewWord("");
-        setNewTranslation("");
-        setNewArticle("");
+
+        try {
+            await axios.post(`${API_BASE_URL}/api/nouns`, {
+                word: newWord,
+                translation: newTranslation,
+                article: newArticle,
+            });
+            fetchWords();
+            setNewWord("");
+            setNewTranslation("");
+            setNewArticle("");
+            setError(""); // Очистить сообщение об ошибке
+        } catch (err) {
+            if (err.response && err.response.data) {
+                // Отображаем сообщение об ошибке из поля "message"
+                setError(err.response.data);
+            } else {
+                setError("An unexpected error occurred. Please try again.");
+            }
+        }
     };
+
+
 
     const deleteWord = async (id) => {
         await axios.delete(`${API_BASE_URL}/api/nouns/${id}`);
@@ -63,6 +77,7 @@ const WordManager = () => {
                 />
                 <button onClick={addWord}>Add Word</button>
             </div>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <table>
                 <thead>
                 <tr>

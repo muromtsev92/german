@@ -1,62 +1,54 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.Noun;
-
-import java.util.Map;
-import java.util.Random;
-import com.example.backend.repository.NounRepository;
+import com.example.backend.service.NounService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/nouns")
 public class NounController {
-    private final NounRepository nounRepository;
+    private final NounService nounService;
 
-    public NounController(NounRepository nounRepository) {
-        this.nounRepository = nounRepository;
+    public NounController(NounService nounService) {
+        this.nounService = nounService;
     }
 
     @GetMapping
-    public List<Noun> getAllNouns() {
-        return nounRepository.findAll();
+    public ResponseEntity<List<Noun>> getAllNouns() {
+        return ResponseEntity.ok(nounService.getAllNouns());
     }
 
     @PostMapping
-    public Noun addWord(@RequestBody Noun noun) {
-        return nounRepository.save(noun);
+    public ResponseEntity<Noun> addNoun(@Valid @RequestBody Noun noun) {
+        return ResponseEntity.ok(nounService.saveNoun(noun));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteWord(@PathVariable Long id) {
-        nounRepository.deleteById(id);
+    public ResponseEntity<Void> deleteNoun(@PathVariable Long id) {
+        nounService.deleteNoun(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/game/random")
-    public Noun getRandomNoun() {
-        List<Noun> nouns = nounRepository.findAll();
-        if (nouns.isEmpty()) {
-            throw new IllegalStateException("No nouns available");
-        }
-        Random random = new Random();
-        return nouns.get(random.nextInt(nouns.size()));
+    public ResponseEntity<Noun> getRandomNoun() {
+        return nounService.getRandomNoun()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @PostMapping("/game/check")
-    public boolean checkTranslation(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Boolean> checkTranslation(@RequestBody Map<String, String> request) {
         String word = request.get("word");
-        String userTranslation = request.get("translation");
+        String translation = request.get("translation");
 
-        Noun noun = nounRepository.findByWord(word)
-                .orElseThrow(() -> new IllegalStateException("Word not found"));
-
-        return noun.getTranslation().equalsIgnoreCase(userTranslation);
+        return nounService.findByWord(word)
+                .map(noun -> ResponseEntity.ok(noun.getTranslation().equalsIgnoreCase(translation)))
+                .orElse(ResponseEntity.badRequest().build());
     }
-
-    @PostMapping("/bulk")
-    public List<Noun> addNounsBulk(@RequestBody List<Noun> nouns) {
-        return nounRepository.saveAll(nouns);
-    }
-
 }
+
