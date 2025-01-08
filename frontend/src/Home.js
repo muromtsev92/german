@@ -4,7 +4,7 @@ import WordManager from "./WordManager";
 const Home = () => {
     return (
         <div>
-            <h1>Welcome to the German Learning App</h1>
+            <h1>Wörterliste</h1>
             <WordManager />
         </div>
     );
