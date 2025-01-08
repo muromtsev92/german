@@ -1,18 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:8080/api/words';
-// const API_BASE_URL = 'http://37.46.16.152/api/words';
+// Базовый URL берётся из переменных окружения
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-export const getAllWords = async () => {
-    const response = await axios.get(API_BASE_URL);
+export const getRandomNoun = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/nouns/game/random`);
     return response.data;
 };
 
-export const addWord = async (word, translation) => {
-    const response = await axios.post(API_BASE_URL, { word, translation });
+export const checkTranslation = async (word, translation) => {
+    const response = await axios.post(`${API_BASE_URL}/api/nouns/game/check`, {
+        word,
+        translation
+    });
     return response.data;
 };
 
-export const deleteWord = async (id) => {
-    await axios.delete(`${API_BASE_URL}/${id}`);
-};
