@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import './Game.css';
 
 const Game = () => {
     // Состояния для игры
@@ -90,7 +91,6 @@ const Game = () => {
         ) {
             const updatedTranslation = `${article} ${userTranslation.trim()}`;
             setUserTranslation(updatedTranslation); // Добавляем артикль
-
             // Перемещаем курсор в конец текста
             setTimeout(() => {
                 if (inputRef.current) {
@@ -101,86 +101,91 @@ const Game = () => {
         }
     };
 
-
     return (
-        <div>
-            <h1>Translation Game</h1>
+        <div className="container">
             {/* Настройки перед началом игры */}
             {!gameStarted && (
-                <div>
-                    <label>
+                <div className="form">
+                    <label className="label">
                         Number of words:
                         <input
+                            className="input"
                             type="number"
                             value={maxWords}
                             onChange={(e) => setMaxWords(Number(e.target.value))}
                             disabled={gameStarted}
                         />
                     </label>
-                    <label>
+                    <label className="label">
                         Direction:
-                        <select
-                            value={direction}
-                            onChange={(e) => setDirection(e.target.value)}
-                            disabled={gameStarted}
-                        >
-                            <option value="de-ru">German to Russian</option>
-                            <option value="ru-de">Russian to German</option>
-                        </select>
+                        <div className="toggle-container">
+                            <span className={direction === "de-ru" ? "active-text" : ""}>DE → RU</span>
+                            <div className="toggle-switch">
+                                <input
+                                    type="checkbox"
+                                    id="directionToggle"
+                                    checked={direction === "ru-de"}
+                                    onChange={() => setDirection(direction === "de-ru" ? "ru-de" : "de-ru")}
+                                    disabled={gameStarted}
+                                />
+                                <label htmlFor="directionToggle" className="toggle-slider"></label>
+                            </div>
+                            <span className={direction === "ru-de" ? "active-text" : ""}>RU → DE</span>
+                        </div>
                     </label>
-                    <button onClick={handleStartGame}>Start Game</button>
+                    <button className="button" onClick={handleStartGame}>Start Game</button>
                 </div>
             )}
+
             {/* Основной игровой процесс */}
             {gameStarted && currentWord && (
                 <div>
-                    <p>Score: {score}</p>
+                    <p className="message">Score: {score}</p>
                     <p>
                         {direction === "de-ru" ? "Translate:" : "Переведите:"}{" "}
                         {direction === "de-ru" ? currentWord.word : currentWord.translation}
                     </p>
                     <input
-                        ref={inputRef} // Привязываем ссылку для управления курсором
+                        className="input"
+                        ref={inputRef}
                         type="text"
                         value={userTranslation}
                         onChange={(e) => setUserTranslation(e.target.value)}
                         placeholder="Enter translation"
                     />
-                    {/* Кнопки артиклей */}
                     {direction === "ru-de" && currentWord.article && (
-                        <div>
+                        <div className="article-buttons-container">
                             <button
+                                className={`article-button ${userTranslation.startsWith("der") ? "article-button-disabled" : ""}`}
+                                disabled={userTranslation.startsWith("der")}
                                 onClick={() => handleArticleClick("der")}
-                                disabled={["der", "di", "da"].some((a) =>
-                                    userTranslation.toLowerCase().startsWith(a)
-                                )}
                             >
                                 der
                             </button>
                             <button
+                                className={`article-button ${userTranslation.startsWith("die") ? "article-button-disabled" : ""}`}
+                                disabled={userTranslation.startsWith("die")}
                                 onClick={() => handleArticleClick("die")}
-                                disabled={["der", "di", "da"].some((a) =>
-                                    userTranslation.toLowerCase().startsWith(a)
-                                )}
                             >
                                 die
                             </button>
                             <button
+                                className={`article-button ${userTranslation.startsWith("das") ? "article-button-disabled" : ""}`}
+                                disabled={userTranslation.startsWith("das")}
                                 onClick={() => handleArticleClick("das")}
-                                disabled={["der", "di", "da"].some((a) =>
-                                    userTranslation.toLowerCase().startsWith(a)
-                                )}
                             >
                                 das
                             </button>
                         </div>
                     )}
-                    <button onClick={handleCheckTranslation}>Check</button>
-                    <p>{message}</p>
-                    <p>Remaining: {maxWords - attempts}</p>
+                    <div className="check-button-container">
+                        <button className="check-button" onClick={handleCheckTranslation}>Check</button>
+                    </div>
+
+                    <p className="message">{message}</p>
                 </div>
             )}
-            {/* Конец игры */}
+
             {gameStarted && !currentWord && (
                 <div>
                     <h2>Game Over!</h2>
@@ -197,7 +202,7 @@ const Game = () => {
                             return <p>Congratulations, you are loser!</p>;
                         }
                     })()}
-                    <button onClick={handleRestart}>Restart</button>
+                    <button className="button" onClick={handleRestart}>Restart</button>
                 </div>
             )}
         </div>
