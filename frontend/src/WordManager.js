@@ -2,6 +2,66 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const WordManager = () => {
+    const styles = {
+        container: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            backgroundColor: '#f9f9f9',
+            padding: '20px',
+        },
+        header: {
+            fontSize: '2rem',
+            fontWeight: 'bold',
+            marginBottom: '20px',
+            textAlign: 'center',
+        },
+        form: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            width: '100%',
+            maxWidth: '400px',
+        },
+        input: {
+            padding: '10px',
+            fontSize: '1rem',
+            borderRadius: '5px',
+            border: '1px solid #ccc',
+        },
+        button: {
+            padding: '10px 20px',
+            fontSize: '1rem',
+            borderRadius: '5px',
+            backgroundColor: '#28a745',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+        },
+        table: {
+            width: '100%',
+            maxWidth: '600px',
+            marginTop: '20px',
+            borderCollapse: 'collapse',
+        },
+        tableHeader: {
+            backgroundColor: "#007bff",
+            color: "#fff",
+            fontWeight: "bold",
+            textAlign: "center", // Центрирование текста
+            padding: "10px",
+        },
+        tableCell: {
+            padding: "10px",
+            border: "1px solid #ccc",
+            textAlign: "center", // Центрирование содержимого
+        },
+    };
+
+
     const [words, setWords] = useState([]);
     const [newWord, setNewWord] = useState("");
     const [newTranslation, setNewTranslation] = useState("");
@@ -54,22 +114,25 @@ const WordManager = () => {
     };
 
     return (
-        <div>
+        <div style={styles.container}>
             <h2>Liste verwalten</h2>
-            <div>
+            <div style={styles.header}>
                 <input
+                    style={styles.input}
                     type="text"
                     value={newArticle}
                     onChange={(e) => setNewArticle(e.target.value)}
                     placeholder="Article (der/die/das)"
                 />
                 <input
+                    style={styles.input}
                     type="text"
                     value={newWord}
                     onChange={(e) => setNewWord(e.target.value)}
                     placeholder="Word"
                 />
                 <input
+                    style={styles.input}
                     type="text"
                     value={newTranslation}
                     onChange={(e) => setNewTranslation(e.target.value)}
@@ -78,7 +141,7 @@ const WordManager = () => {
                 <button onClick={addWord}>Add Word</button>
             </div>
             {error && <p style={{ color: "red" }}>{error}</p>}
-            <table>
+            <table style={styles.table}>
                 <thead>
                 <tr>
                     <th>ID</th>
