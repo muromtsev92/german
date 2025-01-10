@@ -1,10 +1,16 @@
 import React from "react";
 import WordManager from "./WordManager";
 
+const styles = {
+    textCenter: {
+    textAlign: "center"
+    }
+}
+
 const Home = () => {
     return (
         <div>
-            <h1>Wörterliste</h1>
+            <h1 style={styles.textCenter}>Wörterliste</h1>
             <WordManager />
         </div>
     );
