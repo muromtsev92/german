@@ -1,78 +1,73 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import './Game.css';
 
 const Game = () => {
-    // Состояния для игры
-    const [words, setWords] = useState([]); // Список слов
-    const [currentWord, setCurrentWord] = useState(null); // Текущее слово
-    const [nextWord, setNextWord] = useState(null); // Следующее слово
-    const [userTranslation, setUserTranslation] = useState(""); // Ответ пользователя
-    const [score, setScore] = useState(0); // Количество правильных ответов
-    const [attempts, setAttempts] = useState(0); // Количество попыток
-    const [maxWords, setMaxWords] = useState(5); // Максимальное количество слов
-    const [direction, setDirection] = useState("de-ru"); // Направление перевода
-    const [message, setMessage] = useState(""); // Сообщение о результате
-    const [gameStarted, setGameStarted] = useState(false); // Флаг начала игры
+    const [words, setWords] = useState([]);
+    const [currentWord, setCurrentWord] = useState(null);
+    const [nextWord, setNextWord] = useState(null);
+    const [userTranslation, setUserTranslation] = useState("");
+    const [score, setScore] = useState(0);
+    const [attempts, setAttempts] = useState(0);
+    const [maxWords, setMaxWords] = useState(5);
+    const [direction, setDirection] = useState("de-ru");
+    const [message, setMessage] = useState("");
+    const [gameStarted, setGameStarted] = useState(false);
+    const [isGameActive, setIsGameActive] = useState(true);
 
-    const inputRef = useRef(null); // Ссылка на поле ввода для перемещения курсора
+    const inputRef = useRef(null);
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL; // URL API
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-    // Запрос слов из базы данных при начале игры
-    useEffect(() => {
-        if (gameStarted) {
-            fetchWords();
-        }
-    }, [gameStarted]);
-
-    // Запрашивает слова из API и перемешивает их
-    const fetchWords = async () => {
+    const fetchWords = useCallback(async () => {
         const response = await axios.get(`${API_BASE_URL}/api/nouns`);
-        const shuffledWords = response.data.sort(() => Math.random() - 0.5); // Перемешивание списка
-        setWords(shuffledWords.slice(0, maxWords)); // Ограничиваем количество слов
-        setCurrentWord(shuffledWords[0]); // Устанавливаем первое слово
-        setNextWord(shuffledWords[1] || null); // Устанавливаем следующее слово
-    };
+        const shuffledWords = response.data.sort(() => Math.random() - 0.5);
+        setWords(shuffledWords.slice(0, maxWords));
+        setCurrentWord(shuffledWords[0]);
+        setNextWord(shuffledWords[1] || null);
+    }, [API_BASE_URL, maxWords]);
 
-    // Начинает игру
-    const handleStartGame = () => {
-        setGameStarted(true);
-    };
-
-    // Проверяет ответ пользователя
-    const handleCheckTranslation = () => {
+    const handleCheckTranslation = useCallback(() => {
         if (!currentWord) return;
 
-        // Определяем правильный перевод в зависимости от направления
         const correctTranslation =
             direction === "de-ru" ? currentWord.translation : `${currentWord.article} ${currentWord.word}`;
 
-        // Сравниваем ответ пользователя с правильным переводом
         if (userTranslation.trim().toLowerCase() === correctTranslation.toLowerCase()) {
             setMessage("Correct!");
-            setScore(score + 1); // Увеличиваем счёт
+            setScore((prevScore) => prevScore + 1);
         } else {
             setMessage(`Wrong! Correct answer: ${correctTranslation}`);
         }
 
-        // Переходим к следующему слову
-        setCurrentWord(nextWord);
-        const nextIndex = attempts + 1;
-        setNextWord(words[nextIndex + 1] || null);
+        if (!nextWord) {
+            setIsGameActive(false);
+        } else {
+            setCurrentWord(nextWord);
+            setNextWord(words[attempts + 2] || null);
+        }
 
-        // Очищаем сообщение через 2 секунды
-        setTimeout(() => {
-            setMessage("");
-        }, 2000);
+        setAttempts((prevAttempts) => prevAttempts + 1);
+        setUserTranslation("");
 
-        setAttempts(attempts + 1); // Увеличиваем количество попыток
-        setUserTranslation(""); // Сбрасываем ввод пользователя
+        if (isGameActive) {
+            setTimeout(() => {
+                setMessage("");
+            }, 50000);
+        }
+
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [currentWord, userTranslation, nextWord, words, direction, attempts, isGameActive]);
+
+    const handleStartGame = () => {
+        setGameStarted(true);
     };
 
-    // Перезапускает игру
     const handleRestart = () => {
         setGameStarted(false);
+        setIsGameActive(true);
         setScore(0);
         setAttempts(0);
         setMessage("");
@@ -82,16 +77,13 @@ const Game = () => {
         setNextWord(null);
     };
 
-    // Обрабатывает нажатие кнопки с артиклем
     const handleArticleClick = (article) => {
-        // Проверяем, можно ли добавить артикль
         if (
             userTranslation.trim() === "" ||
             !["der", "die", "das"].some((a) => userTranslation.startsWith(a))
         ) {
             const updatedTranslation = `${article} ${userTranslation.trim()}`;
-            setUserTranslation(updatedTranslation); // Добавляем артикль
-            // Перемещаем курсор в конец текста
+            setUserTranslation(updatedTranslation);
             setTimeout(() => {
                 if (inputRef.current) {
                     inputRef.current.focus();
@@ -101,9 +93,38 @@ const Game = () => {
         }
     };
 
+    /**для уборки клавиатуры на мобилках*/
+    const handleContainerClick = (event) => {
+        if (
+            inputRef.current &&
+            !inputRef.current.contains(event.target)
+        ) {
+            inputRef.current.blur();
+        }
+    };
+
+    useEffect(() => {
+        if (gameStarted) {
+            fetchWords();
+        }
+    }, [gameStarted, fetchWords]);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === "Enter" && gameStarted) {
+                handleCheckTranslation();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [gameStarted, handleCheckTranslation]);
+
     return (
-        <div className="container">
-            {/* Настройки перед началом игры */}
+        <div className="container" onClick={handleContainerClick}>
             {!gameStarted && (
                 <div className="form">
                     <label className="label">
@@ -137,72 +158,85 @@ const Game = () => {
                 </div>
             )}
 
-            {/* Основной игровой процесс */}
-            {gameStarted && currentWord && (
+            {gameStarted && (
                 <div>
                     <p className="message">Score: {score}</p>
-                    <p>
-                        {direction === "de-ru" ? "Translate:" : "Переведите:"}{" "}
-                        {direction === "de-ru" ? currentWord.word : currentWord.translation}
-                    </p>
-                    <input
-                        className="input"
-                        ref={inputRef}
-                        type="text"
-                        value={userTranslation}
-                        onChange={(e) => setUserTranslation(e.target.value)}
-                        placeholder="Enter translation"
-                    />
-                    {direction === "ru-de" && currentWord.article && (
-                        <div className="article-buttons-container">
-                            <button
-                                className={`article-button ${userTranslation.startsWith("der") ? "article-button-disabled" : ""}`}
-                                disabled={userTranslation.startsWith("der")}
-                                onClick={() => handleArticleClick("der")}
-                            >
-                                der
-                            </button>
-                            <button
-                                className={`article-button ${userTranslation.startsWith("die") ? "article-button-disabled" : ""}`}
-                                disabled={userTranslation.startsWith("die")}
-                                onClick={() => handleArticleClick("die")}
-                            >
-                                die
-                            </button>
-                            <button
-                                className={`article-button ${userTranslation.startsWith("das") ? "article-button-disabled" : ""}`}
-                                disabled={userTranslation.startsWith("das")}
-                                onClick={() => handleArticleClick("das")}
-                            >
-                                das
-                            </button>
+                    {currentWord && (
+                        <>
+                            <p>
+                                {direction === "de-ru" ? "Translate:" : "Переведите:"}{" "}
+                                {direction === "de-ru" ? currentWord.word : currentWord.translation}
+                            </p>
+                            <input
+                                className="input"
+                                ref={inputRef}
+                                type="text"
+                                value={userTranslation}
+                                onChange={(e) => setUserTranslation(e.target.value)}
+                                placeholder="Enter translation"
+                                disabled={!isGameActive}
+                            />
+                            {direction === "ru-de" && currentWord.article && (
+                                <div className="article-buttons-container">
+                                    <button
+                                        className="article-button"
+                                        disabled={!isGameActive}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleArticleClick("der")}
+                                    >
+                                        der
+                                    </button>
+                                    <button
+                                        className="article-button"
+                                        disabled={!isGameActive}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleArticleClick("die")}
+                                    >
+                                        die
+                                    </button>
+                                    <button
+                                        className="article-button"
+                                        disabled={!isGameActive}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleArticleClick("das")}
+                                    >
+                                        das
+                                    </button>
+                                </div>
+                            )}
+                            <div className="check-button-container">
+                                <button
+                                    className="check-button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={handleCheckTranslation}
+                                    disabled={!isGameActive}
+                                >
+                                    Check
+                                </button>
+                            </div>
+                            <p className="message">{message}</p>
+                        </>
+                    )}
+
+                    {!isGameActive && (
+                        <div className="game-over">
+                            <h2>Game Over!</h2>
+                            <p>Your score: {score}/{maxWords}</p>
+                            {(() => {
+                                const percentage = (score / maxWords) * 100;
+                                if (percentage === 100) {
+                                    return <p>Congratulations, perfect!</p>;
+                                } else if (percentage >= 90) {
+                                    return <p>Congratulations, almost good!</p>;
+                                } else if (percentage >= 50) {
+                                    return <p>Congratulations, but it could be better!</p>;
+                                } else {
+                                    return <p>Congratulations, you are loser!</p>;
+                                }
+                            })()}
+                            <button className="button" onClick={handleRestart}>Restart</button>
                         </div>
                     )}
-                    <div className="check-button-container">
-                        <button className="check-button" onClick={handleCheckTranslation}>Check</button>
-                    </div>
-
-                    <p className="message">{message}</p>
-                </div>
-            )}
-
-            {gameStarted && !currentWord && (
-                <div>
-                    <h2>Game Over!</h2>
-                    <p>Your score: {score}/{maxWords}</p>
-                    {(() => {
-                        const percentage = (score / maxWords) * 100;
-                        if (percentage === 100) {
-                            return <p>Congratulations, perfect!</p>;
-                        } else if (percentage >= 90) {
-                            return <p>Congratulations, almost good!</p>;
-                        } else if (percentage >= 50) {
-                            return <p>Congratulations, but it could be better!</p>;
-                        } else {
-                            return <p>Congratulations, you are loser!</p>;
-                        }
-                    })()}
-                    <button className="button" onClick={handleRestart}>Restart</button>
                 </div>
             )}
         </div>
