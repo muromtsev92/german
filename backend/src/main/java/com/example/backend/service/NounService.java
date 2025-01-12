@@ -4,6 +4,9 @@ import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.mapper.NounMapper;
 import com.example.backend.repository.NounRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -53,5 +56,11 @@ public class NounService {
 
     public List<Noun> addNounsBulk(List<Noun> nouns) {
         return nounRepository.saveAll(nouns);
+    }
+
+    public Page<NounDTO> getNounsPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return nounRepository.findAll(pageable)
+                .map(nounMapper::toDTO);
     }
 }
