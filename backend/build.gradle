@@ -32,7 +32,6 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.36'
 	annotationProcessor 'org.projectlombok:lombok:1.18.36'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
 	testCompileOnly 'org.projectlombok:lombok:1.18.36'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
