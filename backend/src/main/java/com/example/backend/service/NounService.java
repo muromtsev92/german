@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
+import com.example.backend.mapper.NounMapper;
 import com.example.backend.repository.NounRepository;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +10,19 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class NounService {
     private final NounRepository nounRepository;
+    private final NounMapper nounMapper;
 
-    public List<Noun> getAllNouns() {
-        return nounRepository.findAll();
+    public List<NounDTO> getAllNouns() {
+        return nounRepository.findAll()
+                .stream()
+                .map(nounMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<Noun> getRandomNoun() {
@@ -27,12 +34,13 @@ public class NounService {
         return Optional.of(nouns.get(random.nextInt(nouns.size())));
     }
 
-    public Noun saveNoun(Noun noun) {
-        nounRepository.findByWord(noun.getWord()).ifPresent(existing -> {
+    public NounDTO saveNoun(NounDTO nounDto) {
+        nounRepository.findByWord(nounDto.getWord()).ifPresent(existing -> {
             throw new IllegalArgumentException("Word already exists in the database: " + existing.getArticle()
                     + " " + existing.getWord() + " - " + existing.getTranslation());
         });
-        return nounRepository.save(noun);
+        Noun noun = nounMapper.toEntity(nounDto);
+        return nounMapper.toDTO(nounRepository.save(noun));
     }
 
     public void deleteNoun(Long id) {
@@ -46,5 +54,4 @@ public class NounService {
     public List<Noun> addNounsBulk(List<Noun> nouns) {
         return nounRepository.saveAll(nouns);
     }
-
 }

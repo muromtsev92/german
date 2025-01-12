@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.service.NounService;
 import jakarta.validation.Valid;
@@ -19,13 +20,13 @@ public class NounController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Noun>> getAllNouns() {
+    public ResponseEntity<List<NounDTO>> getAllNouns() {
         return ResponseEntity.ok(nounService.getAllNouns());
     }
 
     @PostMapping
-    public ResponseEntity<Noun> addNoun(@Valid @RequestBody Noun noun) {
-        return ResponseEntity.ok(nounService.saveNoun(noun));
+    public ResponseEntity<NounDTO> addNoun(@Valid @RequestBody NounDTO nounDTO) {
+        return ResponseEntity.ok(nounService.saveNoun(nounDTO));
     }
 
     @DeleteMapping("/{id}")
