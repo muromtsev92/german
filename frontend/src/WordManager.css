@@ -41,6 +41,17 @@
     transition: background-color 0.3s;
 }
 
+.pagination-сontrols {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.select {
+    margin-left: 10px;
+}
+
 .tableContainer {
     display: flex;
     flex-direction: column;

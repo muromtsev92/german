@@ -4,6 +4,7 @@ import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.service.NounService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,13 @@ public class NounController {
     @PostMapping("/bulk")
     public ResponseEntity<List<Noun>> bulk(@RequestBody List<Noun> nouns) {
         return ResponseEntity.ok(nounService.addNounsBulk(nouns));
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<Page<NounDTO>> getNounsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(nounService.getNounsPaged(page, size));
     }
 }
 
