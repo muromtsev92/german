@@ -23,7 +23,8 @@ jobs:
         run: chmod +x ./backend/gradlew # Указываем путь к gradlew
 
       - name: Build project
-        run: ./backend/gradlew build -x test # Указываем путь к gradlew
+        working-directory: ./backend
+        run: ./gradlew build -x test # Указываем путь к gradlew
 
       - name: Build Docker image
         run: docker build -t s25992/german-backend:latest .
