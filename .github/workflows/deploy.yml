@@ -49,8 +49,8 @@ jobs:
       - name: Deploy to server
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@37.46.16.152 <<EOF
-          docker pull s25992/german-backend:latest
           cd /root/german
+          git pull origin master
           docker-compose down
           docker-compose up -d
           EOF
