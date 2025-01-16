@@ -19,14 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set working directory
-        run: cd backend # Укажите ваш рабочий каталог, если Gradle Wrapper находится в подкаталоге
-
       - name: Grant execution permissions for Gradle Wrapper
-        run: chmod +x ./gradlew
+        run: chmod +x ./backend/gradlew # Указываем путь к gradlew
 
       - name: Build project
-        run: ./gradlew build -x test
+        run: ./backend/gradlew build -x test # Указываем путь к gradlew
 
       - name: Build Docker image
         run: docker build -t s25992/german-backend:latest .
