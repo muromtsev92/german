@@ -3,47 +3,53 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - master # Убедитесь, что ветка называется master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Клонирование репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Шаг 2: Установка Java
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'temurin' # Temurin - популярный OpenJDK
 
-      - name: Set working directory
-        run: cd backend
+      # Шаг 3: Установка прав на Gradle Wrapper
+      - name: Grant execution permissions for Gradle Wrapper
+        run: chmod +x ./gradlew
 
+      # Шаг 4: Сборка проекта
       - name: Build project
-        run: ./gradlew build -x test
+        run: ./gradlew build -x test # Пропускаем тесты для ускорения
 
-    - name: Build Docker image
-      run: docker build -t german-backend .
+      # Шаг 5: Сборка Docker-образа
+      - name: Build Docker image
+        run: docker build -t s25992/german-backend:latest .
 
-    - name: Push Docker image
-      run: |
-        echo "Aycdicyeactm1!" | docker login -u "s25992" --password-stdin
-        docker tag german-backend s25992/german-backend:latest
-        docker push s25992/german-backend:latest
+      # Шаг 6: Аутентификация в DockerHub и публикация образа
+      - name: Push Docker image to DockerHub
+        run: |
+          echo "${{ secrets.Aycdicyeactm1! }}" | docker login -u "${{ secrets.s25992 }}" --password-stdin
+          docker push s25992/german-backend:latest
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-    - name: Deploy to server
-      run: |
-        ssh -o StrictHostKeyChecking=no root@37.46.16.152 <<EOF
-        docker pull s25992/german-backend:latest
-        cd /root/german
-        docker-compose down
-        docker-compose up -d
-        EOF
+      # Шаг 1: Развёртывание на сервере
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no root@37.46.16.152 <<EOF
+          docker pull s25992/german-backend:latest
+          cd /root/german
+          docker-compose down
+          docker-compose up -d
+          EOF
