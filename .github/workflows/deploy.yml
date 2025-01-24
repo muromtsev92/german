@@ -3,29 +3,56 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - master # Срабатывание пайплайна при пуше в ветку master
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest # Используется Ubuntu для сборки
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # Проверяем код из репозитория
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3 # Настраиваем Java JDK
+        with:
+          java-version: '17' # Версия Java
+          distribution: 'temurin' # Дистрибуция JDK
+
+      - name: Grant execution permissions for Gradle Wrapper
+        run: chmod +x ./backend/gradlew # Делаем gradlew исполняемым
+
+      - name: Build project
+        working-directory: ./backend # Указываем рабочую директорию для Gradle
+        run: ./gradlew build -x test # Собираем проект, пропуская тесты
 
       - name: Build Docker image
-        run: |
-          docker build -t s25992/german-backend:latest .
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push s25992/german-backend:latest
+        run: docker build -t s25992/german-backend:latest . # Собираем Docker-образ приложения
 
-      - name: Deploy to Server
+      - name: Push Docker image to DockerHub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push s25992/german-backend:latest # Публикуем образ в DockerHub
+
+  deploy:
+    runs-on: ubuntu-latest # Используется Ubuntu для деплоя
+    needs: build # Деплой выполняется после успешной сборки
+
+    steps:
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H 37.46.16.152 >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no root@37.46.16.152 <<EOF
           cd /root/german
-          ./restart.sh
+          git pull origin master
+          docker-compose down
+          docker-compose pull
+          docker image prune -af
+          docker-compose up -d
           EOF
