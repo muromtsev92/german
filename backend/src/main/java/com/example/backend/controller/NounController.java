@@ -36,23 +36,6 @@ public class NounController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/game/random")
-    public ResponseEntity<Noun> getRandomNoun() {
-        return nounService.getRandomNoun()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
-    }
-
-    @PostMapping("/game/check")
-    public ResponseEntity<Boolean> checkTranslation(@RequestBody Map<String, String> request) {
-        String word = request.get("word");
-        String translation = request.get("translation");
-
-        return nounService.findByWord(word)
-                .map(noun -> ResponseEntity.ok(noun.getTranslation().equalsIgnoreCase(translation)))
-                .orElse(ResponseEntity.badRequest().build());
-    }
-
     @PostMapping("/bulk")
     public ResponseEntity<List<Noun>> bulk(@RequestBody List<Noun> nouns) {
         return ResponseEntity.ok(nounService.addNounsBulk(nouns));
@@ -63,6 +46,15 @@ public class NounController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(nounService.getNounsPaged(page, size));
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<Boolean> checkArticle(@RequestBody Map<String, String> request) {
+        String word = request.get("word");
+        String article = request.get("article");
+
+        boolean isCorrect = nounService.checkArticle(word, article);
+        return ResponseEntity.ok(isCorrect);
     }
 }
 
