@@ -63,4 +63,10 @@ public class NounService {
         return nounRepository.findAll(pageable)
                 .map(nounMapper::toDTO);
     }
+
+    public boolean checkArticle(String word, String article) {
+        return nounRepository.findByWord(word)
+                .map(noun -> noun.getArticle().equalsIgnoreCase(article))
+                .orElse(false);
+    }
 }
