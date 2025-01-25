@@ -35,3 +35,4 @@ out/
 
 ### VS Code ###
 .vscode/
+main/java/com/example/backend/config/WebConfig.java

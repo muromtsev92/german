@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Game.css"; // Используем существующие стили
+import "./Game.css";
 
 const GuessArticleGame = () => {
     const [settingsVisible, setSettingsVisible] = useState(true);
@@ -7,7 +7,7 @@ const GuessArticleGame = () => {
     const [words, setWords] = useState([]);
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [correctCount, setCorrectCount] = useState(0);
-    const [totalWords, setTotalWords] = useState(10); // Значение по умолчанию для ползунка
+    const [totalWords, setTotalWords] = useState(10);
     const [feedback, setFeedback] = useState("");
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -16,14 +16,20 @@ const GuessArticleGame = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/nouns/paged?size=${totalWords}`);
             const data = await response.json();
-            setWords(data.content);
-            setSettingsVisible(false);
-            setGameActive(true);
-            setCurrentWordIndex(0);
-            setCorrectCount(0);
-            setFeedback("");
+
+            if (data && data.content) {
+                setWords(data.content);
+                setSettingsVisible(false);
+                setGameActive(true);
+                setCurrentWordIndex(0);
+                setCorrectCount(0);
+                setFeedback("");
+            } else {
+                setFeedback("Не удалось загрузить слова. Попробуйте снова.");
+            }
         } catch (error) {
             console.error("Error fetching words:", error);
+            setFeedback("Ошибка загрузки данных.");
         }
     };
 
@@ -39,19 +45,26 @@ const GuessArticleGame = () => {
                 }),
             });
             const isCorrect = await response.json();
+
             if (isCorrect) {
                 setCorrectCount((prev) => prev + 1);
-                setFeedback(`Правильно — ${selectedArticle} ${currentWord.word}`);
+                setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word}`);
             } else {
-                setFeedback(`Неправильно! Правильный артикль: <strong>${currentWord.article}</strong> ${currentWord.word}`);
+                setFeedback(`❌ Неправильно! Правильный артикль: ${currentWord.article}`);
             }
+
+            // Переход к следующему слову или завершение игры
             if (currentWordIndex + 1 < words.length) {
-                setCurrentWordIndex((prev) => prev + 1);
+                setTimeout(() => {
+                    setCurrentWordIndex((prev) => prev + 1);
+                    setFeedback("");
+                }, 1500); // Небольшая задержка для отображения результата
             } else {
                 setGameActive(false);
             }
         } catch (error) {
             console.error("Error checking article:", error);
+            setFeedback("Ошибка проверки. Попробуйте снова.");
         }
     };
 
@@ -60,7 +73,7 @@ const GuessArticleGame = () => {
         setGameActive(false);
         setWords([]);
         setCorrectCount(0);
-        setTotalWords(10); // Сбрасываем на значение по умолчанию
+        setTotalWords(10);
         setFeedback("");
     };
 
@@ -105,12 +118,7 @@ const GuessArticleGame = () => {
                         </button>
                     ))}
                 </div>
-                {feedback && (
-                    <p
-                        className="feedback"
-                        dangerouslySetInnerHTML={{ __html: feedback }}
-                    ></p>
-                )}
+                {feedback && <p className="feedback">{feedback}</p>}
                 <p>
                     Пройдено: {currentWordIndex + 1} / {words.length}. Угадано: {correctCount}.
                 </p>
