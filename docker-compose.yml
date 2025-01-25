@@ -17,7 +17,7 @@ services:
     image: s25992/german-backend:latest
     container_name: german-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/german
+      SPRING_DATASOURCE_URL: jdbc:postgresql://german-db:5432/german
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     ports:
