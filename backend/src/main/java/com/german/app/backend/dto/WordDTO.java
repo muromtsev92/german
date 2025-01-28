@@ -1,6 +1,5 @@
 package com.german.app.backend.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 @Data

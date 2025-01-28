@@ -10,10 +10,9 @@ import com.german.app.backend.model.enums.Article;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "nouns")
 public class Noun extends Word {
-    @Column(nullable = false)
     private String plural;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Article article;
 }
 

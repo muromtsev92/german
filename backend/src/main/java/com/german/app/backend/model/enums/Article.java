@@ -1,21 +1,21 @@
 package com.german.app.backend.model.enums;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Getter
 public enum Article {
-    DER("der"),
-    DIE("die"),
-    DAS("das");
+    DER,
+    DIE,
+    DAS;
 
-    private final String value;
-
-    Article(String value) {
-        this.value = value;
+    @JsonCreator
+    public static Article fromString(String value) {
+        return value == null ? null : Article.valueOf(value.toUpperCase());
     }
 
-    @Override
-    public String toString() {
-        return value;
+    @JsonValue
+    public String toValue() {
+        return this.name().toLowerCase(); // Вернет в JSON формате "der", "die", "das"
     }
 }
+
