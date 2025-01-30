@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  postgres:
+  german-db:
     image: postgres:14
     container_name: german-db
     environment:
@@ -13,8 +11,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  backend:
-    image: s25992/german-backend:latest
+  german-backend:
+    build: ./backend
     container_name: german-backend
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://german-db:5432/german
@@ -25,5 +23,12 @@ services:
     depends_on:
       - german-db
 
+  german-frontend:
+    build: ./frontend
+    container_name: german-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - german-backend
 volumes:
   postgres_data:
