@@ -33,38 +33,24 @@ const GuessArticleGame = () => {
         }
     };
 
-    const checkArticle = async (selectedArticle) => {
+    const checkArticle = (selectedArticle) => {
         const currentWord = words[currentWordIndex];
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/nouns/game/check`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    word: currentWord.word,
-                    article: selectedArticle,
-                }),
-            });
-            const isCorrect = await response.json();
 
-            if (isCorrect) {
-                setCorrectCount((prev) => prev + 1);
-                setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word}`);
-            } else {
-                setFeedback(`❌ Неправильно! Правильный артикль: ${currentWord.article}`);
-            }
+        if (currentWord.article === selectedArticle) {
+            setCorrectCount((prev) => prev + 1);
+            setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word}`);
+        } else {
+            setFeedback(`❌ Неправильно! Правильный артикль: ${currentWord.article}`);
+        }
 
-            // Переход к следующему слову или завершение игры
-            if (currentWordIndex + 1 < words.length) {
-                setTimeout(() => {
-                    setCurrentWordIndex((prev) => prev + 1);
-                    setFeedback("");
-                }, 1500); // Небольшая задержка для отображения результата
-            } else {
-                setGameActive(false);
-            }
-        } catch (error) {
-            console.error("Error checking article:", error);
-            setFeedback("Ошибка проверки. Попробуйте снова.");
+        // Переход к следующему слову или завершение игры
+        if (currentWordIndex + 1 < words.length) {
+            setTimeout(() => {
+                setCurrentWordIndex((prev) => prev + 1);
+                setFeedback("");
+            }, 1500);
+        } else {
+            setGameActive(false);
         }
     };
 
