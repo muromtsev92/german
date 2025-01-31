@@ -48,7 +48,7 @@ const GuessArticleGame = () => {
             setCorrectCount((prev) => prev + 1);
             setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word}`);
         } else {
-            setFeedback(`❌ Неправильно! Правильный артикль: ${currentWord.article}`);
+            setFeedback(`❌ Неправильно: ${currentWord.article} ${currentWord.word}`);
             setIncorrectWords((prev) => [...prev, currentWord]);
 
             if (suddenDeathMode) {
