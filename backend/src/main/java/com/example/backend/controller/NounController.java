@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/nouns")
@@ -23,6 +24,12 @@ public class NounController {
     @GetMapping
     public ResponseEntity<List<NounDTO>> getAllNouns() {
         return ResponseEntity.ok(nounService.getAllNouns());
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<Set<NounDTO>> getRandomNouns(@RequestParam(defaultValue = "10") int size) {
+        Set<NounDTO> randomNouns = nounService.getRandomNouns(size);
+        return ResponseEntity.ok(randomNouns);
     }
 
     @PostMapping

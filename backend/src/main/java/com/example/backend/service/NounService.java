@@ -10,9 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,5 +66,14 @@ public class NounService {
         return nounRepository.findByWord(word)
                 .map(noun -> noun.getArticle().equalsIgnoreCase(article))
                 .orElse(false);
+    }
+
+    public Set<NounDTO> getRandomNouns(int size) {
+        List<Noun> allNouns = nounRepository.findAll();
+        Collections.shuffle(allNouns);
+        return allNouns.stream()
+                .limit(size)
+                .map(nounMapper::toDTO)
+                .collect(Collectors.toSet());
     }
 }
