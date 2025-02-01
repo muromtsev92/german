@@ -21,9 +21,8 @@ const GuessArticleGame = () => {
             const response = await fetch(`${API_BASE_URL}/api/nouns/random?size=${wordCount}`);
             const data = await response.json();
 
-            // УБИРАЕМ data.content, так как API сразу возвращает массив
             if (Array.isArray(data) && data.length > 0) {
-                setWords(data); // Просто сохраняем массив слов
+                setWords(data);
                 setSettingsVisible(false);
                 setGameActive(true);
                 setCurrentWordIndex(0);
@@ -46,9 +45,9 @@ const GuessArticleGame = () => {
 
         if (currentWord.article === selectedArticle) {
             setCorrectCount((prev) => prev + 1);
-            setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word}`);
+            setFeedback(`✅ Правильно: ${selectedArticle} ${currentWord.word} - ${currentWord.translation}`);
         } else {
-            setFeedback(`❌ Неправильно: ${currentWord.article} ${currentWord.word}`);
+            setFeedback(`❌ Неправильно: ${currentWord.article} ${currentWord.word} - ${currentWord.translation}`);
             setIncorrectWords((prev) => [...prev, currentWord]);
 
             if (suddenDeathMode) {
@@ -113,8 +112,8 @@ const GuessArticleGame = () => {
         return (
             <div className="container">
                 <h2 className="header">Erraten Sie den Artikel</h2>
-                <p>
-                    Слово: <strong>{currentWord.word}</strong>
+                <p className="questionWord">
+                    <strong>{currentWord.word}</strong>
                 </p>
                 <div className="buttons">
                     {["der", "die", "das"].map((article) => (
