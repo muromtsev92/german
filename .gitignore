@@ -1,2 +1,7 @@
 /.idea/
 /frontend/.env
+/backend/.env
+/backend/src/main/resources/application.properties
+docker-compose.yml
+*.log
+logs/

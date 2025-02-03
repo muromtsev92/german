@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import './Game.css';
+import "../assets/styles/Game.css";
 
 const Game = () => {
     const [words, setWords] = useState([]);

@@ -1,5 +1,5 @@
 import React from "react";
-import WordManager from "./WordManager";
+import WordManager from "../components/WordManager";
 
 const styles = {
     textCenter: {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Game.css";
+import "../assets/styles/Game.css";
 
 const GuessArticleGame = () => {
     const [settingsVisible, setSettingsVisible] = useState(true);
@@ -151,7 +151,7 @@ const GuessArticleGame = () => {
                         <ul className="list-no-indent">
                             {incorrectWords.map((word, index) => (
                                 <li key={index}>
-                                    {word.word} - правильный артикль: <strong>{word.article}</strong>
+                                    {word.word} - {word.translation} - правильный артикль: <strong>{word.article}</strong>
                                 </li>
                             ))}
                         </ul>

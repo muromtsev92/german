@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Home from "./Home";
-import Game from "./Game";
-import GuessArticleGame from "./GuessArticleGame"; // Импорт нового компонента
+import Home from "./pages/Home";
+import Game from "./pages/Game";
+import GuessArticleGame from "./pages/GuessArticleGame";
 
 const styles = {
     headerContainer: {

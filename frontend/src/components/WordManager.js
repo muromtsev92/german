@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./WordManager.css";
+import "../assets/styles/WordManager.css";
 
 const WordManager = () => {
     const [words, setWords] = useState([]);
