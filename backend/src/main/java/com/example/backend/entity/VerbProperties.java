@@ -15,7 +15,9 @@ public class VerbProperties {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long verbId; // Пока без связи, но позже заменим на @ManyToOne
+    @ManyToOne
+    @JoinColumn(name = "verb_id", nullable = false)
+    private Verb verb; // Пока без связи, но позже заменим на @ManyToOne
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

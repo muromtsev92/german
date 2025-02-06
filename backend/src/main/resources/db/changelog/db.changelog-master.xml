@@ -6,4 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <include file="db/changelog/changes/01_create_verb_properties.xml"/>
+    <include file="db/changelog/changes/02_create_verb_table.xml"/>
+    <include file="db/changelog/changes/03_add_foreign_key_to_verb_properties.xml"/>
 </databaseChangeLog>

@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.VerbPropertiesDTO;
 import com.example.backend.entity.PropertyType;
-import com.example.backend.entity.VerbProperties;
 import com.example.backend.service.VerbPropertiesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,17 +15,17 @@ public class VerbPropertiesController {
     private final VerbPropertiesService service;
 
     @GetMapping
-    public List<VerbProperties> getAll() {
+    public List<VerbPropertiesDTO> getAll() {
         return service.getAll();
     }
 
     @GetMapping("/type/{type}")
-    public List<VerbProperties> getByType(@PathVariable PropertyType type) {
+    public List<VerbPropertiesDTO> getByType(@PathVariable PropertyType type) {
         return service.getByType(type);
     }
 
     @PostMapping
-    public VerbProperties addProperty(
+    public VerbPropertiesDTO addProperty(
             @RequestParam Long verbId,
             @RequestParam PropertyType type,
             @RequestParam String value,
