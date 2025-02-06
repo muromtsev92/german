@@ -159,7 +159,7 @@ const Game = () => {
             )}
 
             {gameStarted && (
-                <div>
+                <div className="container">
                     <p className="message">Score: {score}</p>
                     {currentWord && (
                         <>
