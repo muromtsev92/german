@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.service.NounService;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,13 @@ public class NounGameController {
         this.nounService = nounService;
     }
 
-    @GetMapping("/random")
-    public ResponseEntity<Noun> getRandomNoun() {
-        return nounService.getRandomNoun()
+    @GetMapping("/find/{word}")
+    public ResponseEntity<NounDTO> findNounByWord(@PathVariable String word) {
+        return nounService.findByWord(word)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+                .orElse(ResponseEntity.notFound().build());
     }
+
 
     @PostMapping("/check")
     public ResponseEntity<Boolean> checkTranslation(@RequestBody Map<String, String> request) {

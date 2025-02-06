@@ -1,16 +1,12 @@
 package com.example.backend.dto;
 
-import lombok.*;
+import lombok.Data;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class VerbDTO {
     private Long id;
-    private String baseForm;
+    private String word;
+    private String translation;
     private String prateritum;
     private String partizipZwei;
-    private String meaning;
 }
-

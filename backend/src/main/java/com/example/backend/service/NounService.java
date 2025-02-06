@@ -4,11 +4,11 @@ import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.mapper.NounMapper;
 import com.example.backend.repository.NounRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,13 +26,13 @@ public class NounService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Noun> getRandomNoun() {
+    public Optional<NounDTO> getRandomNoun() {
         List<Noun> nouns = nounRepository.findAll();
         if (nouns.isEmpty()) {
             return Optional.empty();
         }
         Random random = new Random();
-        return Optional.of(nouns.get(random.nextInt(nouns.size())));
+        return Optional.of(nounMapper.toDTO(nouns.get(random.nextInt(nouns.size()))));
     }
 
     public NounDTO saveNoun(NounDTO nounDto) {
@@ -48,32 +48,14 @@ public class NounService {
         nounRepository.deleteById(id);
     }
 
-    public Optional<Noun> findByWord(String word) {
-        return nounRepository.findByWord(word);
-    }
-
-    public List<Noun> addNounsBulk(List<Noun> nouns) {
-        return nounRepository.saveAll(nouns);
-    }
-
     public Page<NounDTO> getNounsPaged(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return nounRepository.findAll(pageable)
                 .map(nounMapper::toDTO);
     }
 
-    public boolean checkArticle(String word, String article) {
-        return nounRepository.findByWord(word)
-                .map(noun -> noun.getArticle().equalsIgnoreCase(article))
-                .orElse(false);
+    public Optional<NounDTO> findByWord(String word) {
+        return nounRepository.findByWord(word).map(nounMapper::toDTO);
     }
 
-    public Set<NounDTO> getRandomNouns(int size) {
-        List<Noun> allNouns = nounRepository.findAll();
-        Collections.shuffle(allNouns);
-        return allNouns.stream()
-                .limit(size)
-                .map(nounMapper::toDTO)
-                .collect(Collectors.toSet());
-    }
 }

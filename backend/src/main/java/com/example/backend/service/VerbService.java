@@ -9,27 +9,37 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class VerbService {
-    private final VerbRepository repository;
-    private final VerbMapper mapper = VerbMapper.INSTANCE;
+    private final VerbRepository verbRepository;
+    private final VerbMapper verbMapper;
 
     public List<VerbDTO> getAllVerbs() {
-        return repository.findAll().stream()
-                .map(mapper::toDto)
+        return verbRepository.findAll()
+                .stream()
+                .map(verbMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<VerbDTO> getVerbById(Long id) {
-        return repository.findById(id).map(mapper::toDto);
+    public Optional<VerbDTO> getRandomVerb() {
+        List<Verb> verbs = verbRepository.findAll();
+        if (verbs.isEmpty()) {
+            return Optional.empty();
+        }
+        Random random = new Random();
+        return Optional.of(verbMapper.toDTO(verbs.get(random.nextInt(verbs.size()))));
     }
 
-    public VerbDTO addVerb(String baseForm, String prateritum, String partizipZwei, String meaning) {
-        Verb verb = new Verb(null, baseForm, prateritum, partizipZwei, meaning, null);
-        return mapper.toDto(repository.save(verb));
+    public VerbDTO saveVerb(VerbDTO verbDTO) {
+        Verb verb = verbMapper.toEntity(verbDTO);
+        return verbMapper.toDTO(verbRepository.save(verb));
+    }
+
+    public void deleteVerb(Long id) {
+        verbRepository.deleteById(id);
     }
 }
-

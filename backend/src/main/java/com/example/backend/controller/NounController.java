@@ -1,39 +1,26 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.NounDTO;
-import com.example.backend.entity.Noun;
 import com.example.backend.service.NounService;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/nouns")
+@RequiredArgsConstructor
 public class NounController {
     private final NounService nounService;
-
-    public NounController(NounService nounService) {
-        this.nounService = nounService;
-    }
 
     @GetMapping
     public ResponseEntity<List<NounDTO>> getAllNouns() {
         return ResponseEntity.ok(nounService.getAllNouns());
     }
 
-    @GetMapping("/random")
-    public ResponseEntity<Set<NounDTO>> getRandomNouns(@RequestParam(defaultValue = "10") int size) {
-        Set<NounDTO> randomNouns = nounService.getRandomNouns(size);
-        return ResponseEntity.ok(randomNouns);
-    }
-
     @PostMapping
-    public ResponseEntity<NounDTO> addNoun(@Valid @RequestBody NounDTO nounDTO) {
+    public ResponseEntity<NounDTO> saveNoun(@RequestBody NounDTO nounDTO) {
         return ResponseEntity.ok(nounService.saveNoun(nounDTO));
     }
 
@@ -43,25 +30,10 @@ public class NounController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/bulk")
-    public ResponseEntity<List<Noun>> bulk(@RequestBody List<Noun> nouns) {
-        return ResponseEntity.ok(nounService.addNounsBulk(nouns));
-    }
-
-    @GetMapping("/paged")
-    public ResponseEntity<Page<NounDTO>> getNounsPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(nounService.getNounsPaged(page, size));
-    }
-
-    @PostMapping("/check")
-    public ResponseEntity<Boolean> checkArticle(@RequestBody Map<String, String> request) {
-        String word = request.get("word");
-        String article = request.get("article");
-
-        boolean isCorrect = nounService.checkArticle(word, article);
-        return ResponseEntity.ok(isCorrect);
+    @GetMapping("/random")
+    public ResponseEntity<NounDTO> getRandomNoun() {
+        return nounService.getRandomNoun()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build()); // Оставляем ResponseEntity<NounDTO>
     }
 }
-

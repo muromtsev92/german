@@ -3,35 +3,37 @@ package com.example.backend.controller;
 import com.example.backend.dto.VerbDTO;
 import com.example.backend.service.VerbService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @RestController
-@RequestMapping("/verbs")
+@RequestMapping("/api/verbs")
 @RequiredArgsConstructor
 public class VerbController {
-    private final VerbService service;
+    private final VerbService verbService;
 
     @GetMapping
-    public List<VerbDTO> getAllVerbs() {
-        return service.getAllVerbs();
-    }
-
-    @GetMapping("/{id}")
-    public Optional<VerbDTO> getVerbById(@PathVariable Long id) {
-        return service.getVerbById(id);
+    public ResponseEntity<List<VerbDTO>> getAllVerbs() {
+        return ResponseEntity.ok(verbService.getAllVerbs());
     }
 
     @PostMapping
-    public VerbDTO addVerb(
-            @RequestParam String baseForm,
-            @RequestParam(required = false) String prateritum,
-            @RequestParam(required = false) String partizipZwei,
-            @RequestParam(required = false) String meaning) {
-        return service.addVerb(baseForm, prateritum, partizipZwei, meaning);
+    public ResponseEntity<VerbDTO> saveVerb(@RequestBody VerbDTO verbDTO) {
+        return ResponseEntity.ok(verbService.saveVerb(verbDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVerb(@PathVariable Long id) {
+        verbService.deleteVerb(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<VerbDTO> getRandomVerb() {
+        return verbService.getRandomVerb()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 }
-
