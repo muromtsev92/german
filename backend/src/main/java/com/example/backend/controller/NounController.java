@@ -34,6 +34,11 @@ public class NounController {
     public ResponseEntity<NounDTO> getRandomNoun() {
         return nounService.getRandomNoun()
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build()); // Оставляем ResponseEntity<NounDTO>
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<NounDTO>> saveNounsBulk(@RequestBody List<NounDTO> nounDtos) {
+        return ResponseEntity.ok(nounService.saveNounsBulk(nounDtos));
     }
 }

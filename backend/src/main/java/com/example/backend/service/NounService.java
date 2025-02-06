@@ -5,9 +5,6 @@ import com.example.backend.entity.Noun;
 import com.example.backend.mapper.NounMapper;
 import com.example.backend.repository.NounRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -48,14 +45,18 @@ public class NounService {
         nounRepository.deleteById(id);
     }
 
-    public Page<NounDTO> getNounsPaged(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return nounRepository.findAll(pageable)
-                .map(nounMapper::toDTO);
-    }
-
     public Optional<NounDTO> findByWord(String word) {
         return nounRepository.findByWord(word).map(nounMapper::toDTO);
     }
 
+    public List<NounDTO> saveNounsBulk(List<NounDTO> nounDtos) {
+        List<Noun> nouns = nounDtos.stream()
+                .map(nounMapper::toEntity)
+                .collect(Collectors.toList());
+
+        List<Noun> savedNouns = nounRepository.saveAll(nouns);
+        return savedNouns.stream()
+                .map(nounMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }
