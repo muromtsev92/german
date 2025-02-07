@@ -177,7 +177,7 @@ const Game = () => {
                                 disabled={!isGameActive}
                             />
                             {direction === "ru-de" && currentWord.article && (
-                                <div className="article-buttons-container">
+                                <div className="buttons">
                                     <button
                                         className="article-button"
                                         disabled={!isGameActive}

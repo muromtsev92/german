@@ -4,44 +4,67 @@ import "../assets/styles/Game.css";
 const GuessArticleGame = () => {
     const [settingsVisible, setSettingsVisible] = useState(true);
     const [gameActive, setGameActive] = useState(false);
-    const [words, setWords] = useState([]);
-    const [currentWordIndex, setCurrentWordIndex] = useState(0);
+    const [currentWord, setCurrentWord] = useState(null);
     const [correctCount, setCorrectCount] = useState(0);
     const [totalWords, setTotalWords] = useState(10);
     const [feedback, setFeedback] = useState("");
     const [incorrectWords, setIncorrectWords] = useState([]);
+    const [currentWordIndex, setCurrentWordIndex] = useState(0);
     const [suddenDeathMode, setSuddenDeathMode] = useState(false);
     const [gameOver, setGameOver] = useState(false);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-    const startGame = async (isSuddenDeath = false) => {
+    const fetchRandomWord = async () => {
         try {
-            const wordCount = isSuddenDeath ? 100 : totalWords;
-            const response = await fetch(`${API_BASE_URL}/api/nouns/random?size=${wordCount}`);
-            const data = await response.json();
+            const response = await fetch(`${API_BASE_URL}/api/nouns/random`);
+            if (!response.ok) {
+                throw new Error("Не удалось загрузить слово");
+            }
+            const word = await response.json();
+            console.log("Загруженное слово:", word);
 
-            if (Array.isArray(data) && data.length > 0) {
-                setWords(data);
-                setSettingsVisible(false);
-                setGameActive(true);
-                setCurrentWordIndex(0);
-                setCorrectCount(0);
-                setFeedback("");
-                setIncorrectWords([]);
-                setGameOver(false);
-                setSuddenDeathMode(isSuddenDeath);
+            // Проверяем, что структура ответа корректна
+            if (word && word.word && word.article && word.translation) {
+                return {
+                    word: word.word,
+                    article: word.article,
+                    translation: word.translation,
+                };
             } else {
-                setFeedback("Не удалось загрузить слова. Попробуйте снова.");
+                console.error("Ответ API некорректен:", word);
+                return null;
             }
         } catch (error) {
-            console.error("Error fetching words:", error);
-            setFeedback("Ошибка загрузки данных.");
+            console.error("Ошибка при запросе случайного слова:", error);
+            setFeedback("Ошибка загрузки данных. Попробуйте снова.");
+            return null;
         }
     };
 
-    const checkArticle = (selectedArticle) => {
-        const currentWord = words[currentWordIndex];
+    const startGame = async (isSuddenDeath = false) => {
+        setSettingsVisible(false);
+        setGameActive(true);
+        setCorrectCount(0);
+        setFeedback("");
+        setIncorrectWords([]);
+        setGameOver(false);
+        setSuddenDeathMode(isSuddenDeath);
+        setCurrentWordIndex(0);
+
+        const initialWord = await fetchRandomWord();
+        if (initialWord) {
+            setCurrentWord(initialWord);
+        } else {
+            console.error("Не удалось загрузить начальное слово.");
+            setFeedback("Ошибка загрузки начального слова. Попробуйте снова.");
+            setGameActive(false);
+            setGameOver(true);
+        }
+    };
+
+    const checkArticle = async (selectedArticle) => {
+        if (!currentWord) return;
 
         if (currentWord.article === selectedArticle) {
             setCorrectCount((prev) => prev + 1);
@@ -57,9 +80,17 @@ const GuessArticleGame = () => {
             }
         }
 
-        // Переход к следующему слову
-        if (currentWordIndex + 1 < words.length) {
+        if (currentWordIndex + 1 < totalWords) {
             setCurrentWordIndex((prev) => prev + 1);
+            const nextWord = await fetchRandomWord();
+            if (nextWord) {
+                setCurrentWord(nextWord);
+            } else {
+                console.error("Не удалось загрузить следующее слово.");
+                setFeedback("Ошибка загрузки следующего слова. Попробуйте снова.");
+                setGameActive(false);
+                setGameOver(true);
+            }
         } else {
             setGameActive(false);
             setGameOver(true);
@@ -69,7 +100,7 @@ const GuessArticleGame = () => {
     const resetGame = () => {
         setSettingsVisible(true);
         setGameActive(false);
-        setWords([]);
+        setCurrentWord(null);
         setCorrectCount(0);
         setTotalWords(10);
         setFeedback("");
@@ -107,8 +138,7 @@ const GuessArticleGame = () => {
         );
     }
 
-    if (gameActive) {
-        const currentWord = words[currentWordIndex];
+    if (gameActive && currentWord) {
         return (
             <div className="container">
                 <h2 className="header">Erraten Sie den Artikel</h2>
@@ -128,7 +158,7 @@ const GuessArticleGame = () => {
                 </div>
                 {feedback && <p className="feedback">{feedback}</p>}
                 <p>
-                    Пройдено: {currentWordIndex + 1} / {words.length}. Угадано: {correctCount}.
+                    Пройдено: {currentWordIndex + 1} / {totalWords}. Угадано: {correctCount}.
                 </p>
             </div>
         );
@@ -142,7 +172,7 @@ const GuessArticleGame = () => {
                 {suddenDeathMode ? (
                     <p>Вы угадали {correctCount} слов подряд до первой ошибки!</p>
                 ) : (
-                    <p>Угадано: {correctCount} из {words.length} слов.</p>
+                    <p>Угадано: {correctCount} из {totalWords} слов.</p>
                 )}
 
                 {incorrectWords.length > 0 && (
