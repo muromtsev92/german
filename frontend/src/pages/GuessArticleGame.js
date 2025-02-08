@@ -114,7 +114,7 @@ const GuessArticleGame = () => {
             <div className="container">
                 <h2 className="header">Einstellungen des Spiels</h2>
                 <label className="slider-label">
-                    <span>Слов: {totalWords}</span>
+                    <span>Wörter: {totalWords}</span>
                     <input
                         type="range"
                         min="5"
@@ -126,13 +126,13 @@ const GuessArticleGame = () => {
                     />
                 </label>
                 <button className="button" onClick={() => startGame(false)}>
-                    Начать
+                    Starten
                 </button>
                 <button
                     className="button sudden-death"
                     onClick={() => startGame(true)}
                 >
-                    Режим до первой ошибки
+                    Modus bis zum ersten Fehler
                 </button>
             </div>
         );
@@ -158,7 +158,7 @@ const GuessArticleGame = () => {
                 </div>
                 {feedback && <p className="feedback">{feedback}</p>}
                 <p>
-                    Пройдено: {currentWordIndex + 1} / {totalWords}. Угадано: {correctCount}.
+                    Bestanden: {currentWordIndex + 1} / {totalWords}. Угадано: {correctCount}.
                 </p>
             </div>
         );
@@ -167,21 +167,21 @@ const GuessArticleGame = () => {
     if (gameOver) {
         return (
             <div className="container">
-                <h2 className="header">Игра завершена!</h2>
+                <h2 className="header">Spiel beendet!</h2>
 
                 {suddenDeathMode ? (
-                    <p>Вы угадали {correctCount} слов подряд до первой ошибки!</p>
+                    <p>Sie haben {correctCount} Wörter in einer Reihe vor dem ersten Fehler erraten!</p>
                 ) : (
-                    <p>Угадано: {correctCount} из {totalWords} слов.</p>
+                    <p>Erraten: {correctCount} von {totalWords} Wörter.</p>
                 )}
 
                 {incorrectWords.length > 0 && (
                     <>
-                        <h3>Неправильные слова:</h3>
+                        <h3>Falsche Worte:</h3>
                         <ul className="list-no-indent">
                             {incorrectWords.map((word, index) => (
                                 <li key={index}>
-                                    {word.word} - {word.translation} - правильный артикль: <strong>{word.article}</strong>
+                                    {word.word} - {word.translation} - richtig Artikel ist <strong>{word.article}</strong>
                                 </li>
                             ))}
                         </ul>
@@ -189,7 +189,7 @@ const GuessArticleGame = () => {
                 )}
 
                 <button className="button" onClick={resetGame}>
-                    Играть снова
+                    Spielen wieder
                 </button>
             </div>
         );
