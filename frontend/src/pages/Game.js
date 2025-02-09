@@ -220,7 +220,7 @@ const Game = () => {
 
                     {!isGameActive && (
                         <div className="game-over">
-                            <h2>Game Over!</h2>
+                            <h2>Spiel beendet!</h2>
                             <p>Your score: {score}/{maxWords}</p>
                             {(() => {
                                 const percentage = (score / maxWords) * 100;
