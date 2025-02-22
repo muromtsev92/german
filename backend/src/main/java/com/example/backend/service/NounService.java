@@ -23,13 +23,16 @@ public class NounService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<NounDTO> getRandomNoun() {
-        List<Noun> nouns = nounRepository.findAll();
+    public Optional<List<NounDTO>> getRandomNoun(int number) {
+        List<Noun> nouns = nounRepository.findRandomNouns(number);
         if (nouns.isEmpty()) {
             return Optional.empty();
         }
-        Random random = new Random();
-        return Optional.of(nounMapper.toDTO(nouns.get(random.nextInt(nouns.size()))));
+        List<NounDTO> result = new ArrayList<>();
+        for (Noun noun : nouns) {
+            result.add(nounMapper.toDTO(noun));
+        }
+        return Optional.of(result);
     }
 
     public NounDTO saveNoun(NounDTO nounDto) {

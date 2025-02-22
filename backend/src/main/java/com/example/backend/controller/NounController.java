@@ -31,8 +31,8 @@ public class NounController {
     }
 
     @GetMapping("/random")
-    public ResponseEntity<NounDTO> getRandomNoun() {
-        return nounService.getRandomNoun()
+    public ResponseEntity<List<NounDTO>> getRandomNoun(@RequestParam(defaultValue = "1") int count) {
+        return nounService.getRandomNoun(count)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
