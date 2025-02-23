@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.NounDTO;
 import com.example.backend.dto.VerbDTO;
 import com.example.backend.service.VerbService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,11 @@ public class VerbController {
     @PostMapping
     public ResponseEntity<VerbDTO> saveVerb(@RequestBody VerbDTO verbDTO) {
         return ResponseEntity.ok(verbService.saveVerb(verbDTO));
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<VerbDTO>> saveNounsBulk(@RequestBody List<VerbDTO> verbDtos) {
+        return ResponseEntity.ok(verbService.saveNounsBulk(verbDtos));
     }
 
     @DeleteMapping("/{id}")

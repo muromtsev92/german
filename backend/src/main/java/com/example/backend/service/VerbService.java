@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.NounDTO;
 import com.example.backend.dto.VerbDTO;
+import com.example.backend.entity.Noun;
 import com.example.backend.entity.Verb;
 import com.example.backend.mapper.VerbMapper;
 import com.example.backend.repository.VerbRepository;
@@ -41,5 +43,16 @@ public class VerbService {
 
     public void deleteVerb(Long id) {
         verbRepository.deleteById(id);
+    }
+
+    public List<VerbDTO> saveNounsBulk(List<VerbDTO> verbDtos) {
+        List<Verb> verbs = verbDtos.stream()
+                .map(verbMapper::toEntity)
+                .collect(Collectors.toList());
+
+        List<Verb> savedVerbs = verbRepository.saveAll(verbs);
+        return savedVerbs.stream()
+                .map(verbMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

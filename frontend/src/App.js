@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
 import GuessArticleGame from "./pages/GuessArticleGame";
+import VerbManager from "./components/VerbManager";
 
 const styles = {
     headerContainer: {
@@ -35,14 +36,16 @@ function App() {
                 <nav>
                     <Link to="/">Home</Link> |
                     <Link to="/game">Übersetzen</Link> |
-                    <Link to="/guess-article">Den Artikel raten</Link> {/* Новая ссылка */}
+                    <Link to="/guess-article">Den Artikel raten</Link> |
+                    <Link to="/manage-verbs">Verben verwalten</Link>
                 </nav>
             </header>
             <main>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/game" element={<Game />} />
-                    <Route path="/guess-article" element={<GuessArticleGame />} /> {/* Новый маршрут */}
+                    <Route path="/guess-article" element={<GuessArticleGame />} />
+                    <Route path="/manage-verbs" element={<VerbManager />} /> {/* Управление глаголами */}
                 </Routes>
             </main>
         </Router>
