@@ -174,7 +174,7 @@ const GuessArticleGame = () => {
 
                 {incorrectWords.length > 0 && (
                     <>
-                        <h3>Falsche Worte:</h3>
+                        <h3>Falsche Wörter:</h3>
                         <ul className="list-no-indent">
                             {incorrectWords.map((word, index) => (
                                 <li key={index}>
