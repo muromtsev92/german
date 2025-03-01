@@ -11,5 +11,7 @@ public interface NounRepository extends JpaRepository<Noun, Long> {
 
     @Query(value = "SELECT * FROM noun ORDER BY RANDOM() LIMIT :count", nativeQuery = true)
     List<Noun> findRandomNouns(@Param("count") int count);
+
+    Long id(Long id);
 }
 

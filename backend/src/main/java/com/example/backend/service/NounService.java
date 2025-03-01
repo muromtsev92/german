@@ -4,6 +4,7 @@ import com.example.backend.dto.NounDTO;
 import com.example.backend.entity.Noun;
 import com.example.backend.mapper.NounMapper;
 import com.example.backend.repository.NounRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +24,19 @@ public class NounService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<List<NounDTO>> getRandomNoun(int number) {
+    public NounDTO getNounById(Long id) {
+        return nounRepository.findById(id)
+                .map(nounMapper::toDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Noun with id " + id + " not found"));
+    }
+
+    public List<NounDTO> getRandomNoun(int number) {
         List<Noun> nouns = nounRepository.findRandomNouns(number);
-        if (nouns.isEmpty()) {
-            return Optional.empty();
-        }
         List<NounDTO> result = new ArrayList<>();
         for (Noun noun : nouns) {
             result.add(nounMapper.toDTO(noun));
         }
-        return Optional.of(result);
+        return result;
     }
 
     public NounDTO saveNoun(NounDTO nounDto) {

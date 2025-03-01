@@ -19,6 +19,11 @@ public class NounController {
         return ResponseEntity.ok(nounService.getAllNouns());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<NounDTO> getNounById(@PathVariable Long id) {
+        return ResponseEntity.ok(nounService.getNounById(id));
+    }
+
     @PostMapping
     public ResponseEntity<NounDTO> saveNoun(@RequestBody NounDTO nounDTO) {
         return ResponseEntity.ok(nounService.saveNoun(nounDTO));
@@ -32,9 +37,9 @@ public class NounController {
 
     @GetMapping("/random")
     public ResponseEntity<List<NounDTO>> getRandomNoun(@RequestParam(defaultValue = "1") int count) {
-        return nounService.getRandomNoun(count)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        return nounService.getRandomNoun(count).isEmpty() ?
+                ResponseEntity.noContent().build()
+                : ResponseEntity.ok(nounService.getRandomNoun(count));
     }
 
     @PostMapping("/bulk")
